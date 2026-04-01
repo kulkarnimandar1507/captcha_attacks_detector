@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import joblib
 from datetime import datetime
+from pathlib import Path
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import (
@@ -17,22 +18,12 @@ from flask_login import (
 )
 from sklearn.ensemble import IsolationForest
 
-from pathlib import Path
-
-# Absolute path to the project root
+# -------------------------------------------------------------------
+# Absolute paths (works on Render)
+# -------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent
 
-# -------------------------------------------------------------------
-# Configuration
-# -------------------------------------------------------------------
 class Config:
-    # SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    # MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MB
-    # UPLOAD_FOLDER = 'uploads'
-    # DATABASE = os.path.join('instance', 'app.db')
-    # MODEL_PATH = os.path.join('models', 'isolation_forest.pkl')
-    # ALLOWED_EXTENSIONS = {'csv'}
-    class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MB
     UPLOAD_FOLDER = BASE_DIR / 'uploads'
@@ -42,6 +33,11 @@ class Config:
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Ensure required folders exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(os.path.dirname(app.config['DATABASE']), exist_ok=True)
+os.makedirs(os.path.dirname(app.config['MODEL_PATH']), exist_ok=True)
 
 # -------------------------------------------------------------------
 # Flask-Login setup
@@ -171,7 +167,7 @@ def validate_password_strength(password):
     return None
 
 # -------------------------------------------------------------------
-# ML Model Manager (unchanged)
+# ML Model Manager
 # -------------------------------------------------------------------
 class ModelManager:
     _model = None
@@ -239,7 +235,7 @@ class ModelManager:
         return labels, scores.tolist()
 
 # -------------------------------------------------------------------
-# File upload helpers (unchanged)
+# File upload helpers
 # -------------------------------------------------------------------
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
@@ -367,7 +363,6 @@ def signup():
         elif password != confirm:
             flash('Passwords do not match.', 'error')
         else:
-            # Validate password strength
             error_msg = validate_password_strength(password)
             if error_msg:
                 flash(error_msg, 'error')
@@ -471,7 +466,6 @@ def result(upload_id):
     upload, rows = fetch_upload_results(upload_id, current_user.id)
     if upload is None:
         abort(404, description="Upload not found.")
-    # Convert suspicious_count if bytes (just in case)
     if isinstance(upload['suspicious_count'], bytes):
         upload = dict(upload)
         try:
@@ -484,7 +478,6 @@ def result(upload_id):
 @login_required
 def history():
     uploads = fetch_uploads(current_user.id)
-    # Convert any bytes in suspicious_count (for safety)
     converted = []
     for up in uploads:
         up_dict = dict(up)
