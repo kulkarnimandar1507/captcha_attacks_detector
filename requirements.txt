@@ -1,0 +1,13 @@
+# Flask==2.3.3
+# flask-login==0.6.2
+# pandas==2.2.3
+# numpy==1.26.4
+# scikit-learn==1.5.2
+# joblib==1.4.2
+
+Flask==2.3.3
+Flask-Login==0.6.3
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+joblib==1.4.2

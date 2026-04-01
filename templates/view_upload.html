@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-header">
+    <h2>Upload Details: {{ upload['original_filename'] }}</h2>
+    <a href="{{ url_for('download', upload_id=upload['id']) }}" class="btn btn-secondary">📥 Download CSV</a>
+</div>
+
+<!-- Summary Cards (same as result) -->
+<div class="summary-cards">
+    <div class="card summary">
+        <h3>Total Rows</h3>
+        <p class="big-number">{{ upload['total_rows'] }}</p>
+    </div>
+    <div class="card summary">
+        <h3>Suspicious</h3>
+        <p class="big-number">{{ upload['suspicious_count'] }}</p>
+    </div>
+    <div class="card summary">
+        <h3>Suspicious %</h3>
+        <p class="big-number">{{ upload['suspicious_percent'] }}%</p>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>solve_time</th>
+                <th>retry_count</th>
+                <th>attempts_in_window</th>
+                <th>consistency_score</th>
+                <th>normalized_solve_time</th>
+                <th>anomaly_score</th>
+                <th>label</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row['solve_time'] }}</td>
+                <td>{{ row['retry_count'] }}</td>
+                <td>{{ row['attempts_in_window'] }}</td>
+                <td>{{ row['consistency_score'] }}</td>
+                <td>{{ row['normalized_solve_time'] | round(4) }}</td>
+                <td>{{ row['anomaly_score'] | round(4) }}</td>
+                <td>
+                    <span class="badge {{ 'badge-suspicious' if row['label'] == 'Suspicious' else 'badge-human' }}">
+                        {{ row['label'] }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="actions">
+    <a href="{{ url_for('history') }}" class="btn">← Back to History</a>
+</div>
+{% endblock %}

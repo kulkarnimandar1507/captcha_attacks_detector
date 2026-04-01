@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Upload History</h2>
+
+{% if uploads %}
+<table class="history-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>File Name</th>
+            <th>Upload Time</th>
+            <th>Total Rows</th>
+            <th>Suspicious</th>
+            <th>Suspicious %</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for up in uploads %}
+        <tr>
+            <td>{{ up['id'] }}</td>
+            <td>{{ up['original_filename'] }}</td>
+            <td>{{ up['upload_time'] }}</td>
+            <td>{{ up['total_rows'] }}</td>
+            <td>{{ up['suspicious_count'] }}</td>
+            <td>{{ up['suspicious_percent'] }}%</td>
+            <td><a href="{{ url_for('view_upload', upload_id=up['id']) }}" class="btn small">View</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No uploads yet. <a href="{{ url_for('index') }}">Upload a CSV file</a> to get started.</p>
+{% endif %}
+{% endblock %}

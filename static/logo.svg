@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title>CAPTCHA Attack Detector Logo</title>
+  <desc>Futuristic shield logo with radar eye, neural nodes, and CAPTCHA lettering.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c1dff"/>
+      <stop offset="50%" stop-color="#d11f5f"/>
+      <stop offset="100%" stop-color="#1f6dff"/>
+    </linearGradient>
+
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe082"/>
+      <stop offset="100%" stop-color="#ffb300"/>
+    </linearGradient>
+
+    <linearGradient id="cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6ef2ff"/>
+      <stop offset="100%" stop-color="#00c2ff"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0b1020" flood-opacity="0.35"/>
+    </filter>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="shieldClip">
+      <path d="M256 40C314 71 373 85 430 94c0 91-5 238-174 337C87 332 82 185 82 94c57-9 116-23 174-54Z"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <path d="M256 40C314 71 373 85 430 94c0 91-5 238-174 337C87 332 82 185 82 94c57-9 116-23 174-54Z" fill="url(#bg)"/>
+    <path d="M256 57c52 26 105 39 157 48 0 83-8 221-157 310C107 326 99 188 99 105c52-9 105-22 157-48Z" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3"/>
+  </g>
+
+  <g clip-path="url(#shieldClip)">
+    <path d="M70 380C160 312 272 281 438 291" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="18"/>
+    <path d="M95 172C190 130 308 123 433 158" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="16"/>
+
+    <g opacity="0.35">
+      <path d="M120 126H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 170H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 214H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 258H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 302H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 346H394" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M120 390H394" stroke="#ffffff" stroke-width="1.5"/>
+
+      <path d="M144 102V408" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M200 102V408" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M256 102V408" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M312 102V408" stroke="#ffffff" stroke-width="1.5"/>
+      <path d="M368 102V408" stroke="#ffffff" stroke-width="1.5"/>
+    </g>
+
+    <g filter="url(#glow)">
+      <circle cx="256" cy="223" r="78" fill="none" stroke="url(#cyan)" stroke-width="10"/>
+      <circle cx="256" cy="223" r="46" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="6"/>
+      <circle cx="256" cy="223" r="16" fill="url(#accent)"/>
+      <path d="M178 223H334" stroke="url(#cyan)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M256 145V301" stroke="url(#cyan)" stroke-width="6" stroke-linecap="round"/>
+    </g>
+
+    <g>
+      <path d="M256 223 L335 180" stroke="#ffffff" stroke-opacity="0.8" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="335" cy="180" r="8" fill="#ffffff"/>
+      <circle cx="352" cy="160" r="5" fill="#6ef2ff"/>
+      <path d="M335 180 L352 160" stroke="#6ef2ff" stroke-width="3"/>
+
+      <path d="M256 223 L184 276" stroke="#ffffff" stroke-opacity="0.65" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="184" cy="276" r="7" fill="#ffffff"/>
+      <circle cx="162" cy="296" r="5" fill="#ffe082"/>
+      <path d="M184 276 L162 296" stroke="#ffe082" stroke-width="3"/>
+
+      <path d="M256 223 L270 120" stroke="#ffffff" stroke-opacity="0.65" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="270" cy="120" r="7" fill="#ffffff"/>
+    </g>
+
+    <g transform="translate(122 324)">
+      <rect x="0" y="0" width="268" height="64" rx="16" fill="#0b1636" fill-opacity="0.42" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <text x="134" y="42" text-anchor="middle" font-size="34" font-weight="800" letter-spacing="5" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif">CAPTCHA</text>
+      <path d="M78 14l-10 36" stroke="#ffcc66" stroke-width="4" stroke-linecap="round"/>
+      <path d="M194 14l10 36" stroke="#6ef2ff" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <g opacity="0.95">
+      <path d="M118 115l18 18" stroke="#ffe082" stroke-width="4" stroke-linecap="round"/>
+      <path d="M136 115l-18 18" stroke="#ffe082" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="388" cy="118" r="10" fill="#6ef2ff" fill-opacity="0.85"/>
+      <circle cx="404" cy="138" r="5" fill="#ffffff" fill-opacity="0.85"/>
+      <circle cx="118" cy="370" r="6" fill="#ffffff" fill-opacity="0.85"/>
+      <path d="M385 370h24" stroke="#ffe082" stroke-width="4" stroke-linecap="round"/>
+      <path d="M397 358v24" stroke="#ffe082" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

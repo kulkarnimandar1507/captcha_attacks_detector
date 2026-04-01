@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- CSV Upload Section -->
+    <section class="card">
+        <h2>📁 Upload CSV File</h2>
+        <p>Upload a CSV file with the following columns:</p>
+        <ul class="help-list">
+            <li><code>solve_time</code> (float) – time taken to solve the CAPTCHA</li>
+            <li><code>retry_count</code> (int) – number of retries</li>
+            <li><code>attempts_in_window</code> (int) – number of attempts in a recent time window</li>
+            <li><code>consistency_score</code> (float between 0 and 1) – measure of behavior consistency</li>
+        </ul>
+        <form action="{{ url_for('analyze_csv') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="csv_file">Select CSV file (max 5 MB):</label>
+                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+            </div>
+            <button type="submit" class="btn">Upload & Analyze</button>
+        </form>
+    </section>
+
+    <!-- Manual Input Section -->
+    <section class="card">
+        <h2>✏️ Single Attempt (Manual)</h2>
+        <p>Enter values for a single CAPTCHA attempt:</p>
+        <form action="{{ url_for('analyze_manual') }}" method="post">
+            <div class="form-group">
+                <label for="solve_time">Solve time:</label>
+                <input type="number" step="any" min="0" name="solve_time" id="solve_time" required>
+            </div>
+            <div class="form-group">
+                <label for="retry_count">Retry count:</label>
+                <input type="number" min="0" name="retry_count" id="retry_count" required>
+            </div>
+            <div class="form-group">
+                <label for="attempts_in_window">Attempts in window:</label>
+                <input type="number" min="0" name="attempts_in_window" id="attempts_in_window" required>
+            </div>
+            <div class="form-group">
+                <label for="consistency_score">Consistency score (0–1):</label>
+                <input type="number" step="0.01" min="0" max="1" name="consistency_score" id="consistency_score" required>
+            </div>
+            <button type="submit" class="btn">Analyze Single</button>
+        </form>
+
+        {% if manual_result %}
+        <div class="manual-result">
+            <h3>Result</h3>
+            <p><strong>Label:</strong> 
+                <span class="badge {{ 'badge-suspicious' if manual_result.label == 'Suspicious' else 'badge-human' }}">
+                    {{ manual_result.label }}
+                </span>
+            </p>
+            <p><strong>Anomaly Score:</strong> {{ manual_result.anomaly_score }}</p>
+            <p><small>Input: solve_time={{ manual_result.solve_time }}, retry_count={{ manual_result.retry_count }}, attempts_in_window={{ manual_result.attempts_in_window }}, consistency_score={{ manual_result.consistency_score }}</small></p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
