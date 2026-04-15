@@ -13,15 +13,20 @@
             <h1>CAPTCHA Attack Detector</h1>
         </div>
         <p class="subtitle">Behavior‑based bot detection (does not solve CAPTCHAs)</p>
+        
         <nav>
-            {% if current_user.is_authenticated %}
+            <div class="nav-left">
                 <a href="{{ url_for('index') }}">Home</a>
                 <a href="{{ url_for('history') }}">History</a>
-                <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('signup') }}">Sign Up</a>
-            {% endif %}
+            </div>
+            <div class="nav-right">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('signup') }}">Sign Up</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
 
