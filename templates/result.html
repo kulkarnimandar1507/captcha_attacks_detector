@@ -2,27 +2,40 @@
 
 {% block content %}
 <div class="result-header">
-    <h2>Analysis Result</h2>
-    <a href="{{ url_for('download', upload_id=upload['id']) }}" class="btn btn-secondary">📥 Download Original CSV</a>
+    <h2>Analysis Result: {{ upload.original_filename }}</h2>
+    <a href="{{ url_for('download', upload_id=upload.id) }}" class="btn btn-secondary">📥 Download Original CSV</a>
 </div>
 
-<!-- Summary Cards -->
 <div class="summary-cards">
     <div class="card summary">
         <h3>Total Rows</h3>
-        <p class="big-number">{{ upload['total_rows'] }}</p>
+        <p class="big-number">{{ upload.total_rows }}</p>
     </div>
     <div class="card summary">
         <h3>Suspicious</h3>
-        <p class="big-number">{{ upload['suspicious_count'] }}</p>
+        <p class="big-number">{{ upload.suspicious_count }}</p>
     </div>
     <div class="card summary">
         <h3>Suspicious %</h3>
-        <p class="big-number">{{ upload['suspicious_percent'] }}%</p>
+        <p class="big-number">{{ upload.suspicious_percent }}%</p>
     </div>
 </div>
 
-<!-- Results Table -->
+<!-- Row with two charts -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <div class="card" style="padding: 1rem;">
+        <canvas id="labelChart" width="400" height="300"></canvas>
+    </div>
+    <div class="card" style="padding: 1rem;">
+        <canvas id="scoreChart" width="400" height="300"></canvas>
+    </div>
+</div>
+
+<!-- Scatter plot (full width) -->
+<div class="card" style="padding: 1rem; margin-bottom: 2rem;">
+    <canvas id="scatterChart" width="800" height="400"></canvas>
+</div>
+
 <div class="table-container">
     <table>
         <thead>
@@ -39,15 +52,15 @@
         <tbody>
             {% for row in rows %}
             <tr>
-                <td>{{ row['solve_time'] }}</td>
-                <td>{{ row['retry_count'] }}</td>
-                <td>{{ row['attempts_in_window'] }}</td>
-                <td>{{ row['consistency_score'] }}</td>
-                <td>{{ row['normalized_solve_time'] | round(4) }}</td>
-                <td>{{ row['anomaly_score'] | round(4) }}</td>
+                <td>{{ row.solve_time }}</td>
+                <td>{{ row.retry_count }}</td>
+                <td>{{ row.attempts_in_window }}</td>
+                <td>{{ row.consistency_score }}</td>
+                <td>{{ row.normalized_solve_time|round(4) }}</td>
+                <td>{{ row.anomaly_score|round(4) }}</td>
                 <td>
-                    <span class="badge {{ 'badge-suspicious' if row['label'] == 'Suspicious' else 'badge-human' }}">
-                        {{ row['label'] }}
+                    <span class="badge {% if row.label == 'Suspicious' %}badge-suspicious{% else %}badge-human{% endif %}">
+                        {{ row.label }}
                     </span>
                 </td>
             </tr>
@@ -59,4 +72,100 @@
 <div class="actions">
     <a href="{{ url_for('history') }}" class="btn">← Back to History</a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Data from server
+        const suspiciousCount = {{ upload.suspicious_count }};
+        const humanCount = {{ upload.total_rows }} - suspiciousCount;
+        const labels = ['Human', 'Suspicious'];
+        const counts = [humanCount, suspiciousCount];
+
+        // Pie chart
+        const ctxPie = document.getElementById('labelChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: { labels: labels, datasets: [{ data: counts, backgroundColor: ['#4ade80', '#f87171'], borderColor: '#1e293b', borderWidth: 2 }] },
+            options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: '#e2e8f0' } }, title: { display: true, text: 'Classification Distribution', color: '#e2e8f0' } } }
+        });
+
+        // Histogram data
+        const scores = [{% for row in rows %}{{ row.anomaly_score }}{% if not loop.last %},{% endif %}{% endfor %}];
+        const minScore = Math.min(...scores);
+        const maxScore = Math.max(...scores);
+        const binCount = 10;
+        const binWidth = (maxScore - minScore) / binCount;
+        let bins = Array(binCount).fill(0);
+        scores.forEach(score => {
+            let idx = Math.floor((score - minScore) / binWidth);
+            if (idx === binCount) idx = binCount - 1;
+            bins[idx]++;
+        });
+        const binLabels = [];
+        for (let i = 0; i < binCount; i++) {
+            let start = (minScore + i * binWidth).toFixed(2);
+            let end = (minScore + (i+1) * binWidth).toFixed(2);
+            binLabels.push(`${start} – ${end}`);
+        }
+
+        // Bar chart
+        const ctxBar = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: { labels: binLabels, datasets: [{ label: 'Number of rows', data: bins, backgroundColor: '#38bdf8', borderRadius: 8 }] },
+            options: { responsive: true, plugins: { legend: { labels: { color: '#e2e8f0' } }, title: { display: true, text: 'Anomaly Score Distribution', color: '#e2e8f0' } }, scales: { x: { ticks: { color: '#cbd5e1', maxRotation: 45, autoSkip: true }, title: { display: true, text: 'Score range', color: '#94a3b8' } }, y: { ticks: { color: '#cbd5e1' }, title: { display: true, text: 'Frequency', color: '#94a3b8' } } } }
+        });
+
+        // Scatter plot: solve_time vs consistency_score
+        const scatterData = [];
+        {% for row in rows %}
+            scatterData.push({
+                x: {{ row.solve_time }},
+                y: {{ row.consistency_score }},
+                label: '{{ row.label }}'
+            });
+        {% endfor %}
+
+        const humanPoints = scatterData.filter(p => p.label === 'Human');
+        const suspiciousPoints = scatterData.filter(p => p.label === 'Suspicious');
+
+        const ctxScatter = document.getElementById('scatterChart').getContext('2d');
+        new Chart(ctxScatter, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Human',
+                        data: humanPoints.map(p => ({ x: p.x, y: p.y })),
+                        backgroundColor: '#4ade80',
+                        borderColor: '#4ade80',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: 'Suspicious',
+                        data: suspiciousPoints.map(p => ({ x: p.x, y: p.y })),
+                        backgroundColor: '#f87171',
+                        borderColor: '#f87171',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#e2e8f0' } },
+                    title: { display: true, text: 'Solve Time vs Consistency Score (Colored by Label)', color: '#e2e8f0' },
+                    tooltip: { callbacks: { label: (ctx) => `(${ctx.parsed.x.toFixed(2)}, ${ctx.parsed.y.toFixed(2)})` } }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Solve Time (seconds)', color: '#94a3b8' }, ticks: { color: '#cbd5e1' } },
+                    y: { title: { display: true, text: 'Consistency Score', color: '#94a3b8' }, ticks: { color: '#cbd5e1' }, min: 0, max: 1 }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
