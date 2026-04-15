@@ -1,28 +1,247 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card" style="max-width: 400px; margin: 2rem auto;">
-    <h2>Sign Up</h2>
-    <form method="post">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username" required>
+<style>
+    .signup-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .signup-wrapper::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 70% 30%, rgba(56, 189, 248, 0.2), transparent 60%),
+                    radial-gradient(circle at 30% 80%, rgba(255, 193, 7, 0.2), transparent 60%);
+        animation: slowShift 12s ease infinite;
+        z-index: -2;
+    }
+    @keyframes slowShift {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(5%, 5%) rotate(2deg); }
+        100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    .particle {
+        position: absolute;
+        background: rgba(56, 189, 248, 0.4);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: float 10s infinite ease-in-out;
+        z-index: -1;
+    }
+    @keyframes float {
+        0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
+        50% { transform: translateY(-40px) translateX(-20px) scale(1.2); opacity: 0.8; }
+        100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
+    }
+    .signup-card {
+        background: rgba(10, 26, 18, 0.75);
+        backdrop-filter: blur(14px);
+        border-radius: 48px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 480px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        animation: cardGlow 3s infinite alternate;
+    }
+    @keyframes cardGlow {
+        0% { box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.5); border-color: rgba(56, 189, 248, 0.3); }
+        100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); border-color: rgba(56, 189, 248, 0.6); }
+    }
+    .signup-card:hover {
+        transform: translateY(-6px);
+    }
+    .welcome-text {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid #38bdf8;
+        width: 0;
+        animation: typing 1.5s steps(20, end) forwards, blink 0.75s step-end infinite;
+    }
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    @keyframes blink {
+        from, to { border-color: transparent; }
+        50% { border-color: #38bdf8; }
+    }
+    .form-group {
+        margin-bottom: 1.2rem;
+        animation: slideUp 0.4s ease-out forwards;
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #cbd5e1;
+        margin-bottom: 0.4rem;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid #2a5a44;
+        border-radius: 28px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        transform: scale(1.01);
+    }
+    @keyframes slideUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-signup {
+        background: linear-gradient(135deg, #38bdf8, #0284c7);
+        width: 100%;
+        padding: 0.8rem;
+        border: none;
+        border-radius: 40px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 0.5rem;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+        70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+    .btn-signup:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        animation: none;
+    }
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #94a3b8;
+    }
+    .login-link a {
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .password-strength {
+        margin-top: 0.3rem;
+        font-size: 0.7rem;
+    }
+    .strength-weak { color: #f87171; }
+    .strength-medium { color: #fbbf24; }
+    .strength-strong { color: #4ade80; }
+    .match-msg {
+        font-size: 0.7rem;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<div class="signup-wrapper">
+    <div class="signup-card">
+        <div class="welcome-text">✨ Join the network</div>
+        <form method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email (optional)</label>
+                <input type="email" name="email" id="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required>
+                <div class="password-strength" id="passwordStrength"></div>
+                <small style="color: #6c7a8e;">8+ chars, upper, lower, digit, special</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm">Confirm password</label>
+                <input type="password" name="confirm" id="confirm" required>
+                <div id="matchMsg" class="match-msg"></div>
+            </div>
+            <button type="submit" class="btn-signup">Sign up →</button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
         </div>
-        <div class="form-group">
-            <label for="email">Email (optional)</label>
-            <input type="email" name="email" id="email">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" required>
-            <small style="color: #aaa; font-size: 0.8rem;">Minimum 8 characters, at least one uppercase, one lowercase, one digit, and one special character.</small>
-        </div>
-        <div class="form-group">
-            <label for="confirm">Confirm Password</label>
-            <input type="password" name="confirm" id="confirm" required>
-        </div>
-        <button type="submit" class="btn">Create Account</button>
-    </form>
-    <p style="margin-top: 1rem;">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+    </div>
 </div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const strengthDiv = document.getElementById('passwordStrength');
+    const confirmInput = document.getElementById('confirm');
+    const matchMsg = document.getElementById('matchMsg');
+
+    function checkStrength(pw) {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[a-z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(pw)) score++;
+        if (score <= 2) return { text: 'Weak', class: 'strength-weak' };
+        if (score <= 4) return { text: 'Medium', class: 'strength-medium' };
+        return { text: 'Strong', class: 'strength-strong' };
+    }
+
+    passwordInput.addEventListener('input', function() {
+        const result = checkStrength(this.value);
+        strengthDiv.innerHTML = `<span class="${result.class}">${result.text}</span>`;
+        checkMatch();
+    });
+
+    function checkMatch() {
+        if (confirmInput.value === passwordInput.value && passwordInput.value !== '') {
+            matchMsg.innerHTML = '<span style="color: #4ade80;">✓ Passwords match</span>';
+        } else if (confirmInput.value !== '') {
+            matchMsg.innerHTML = '<span style="color: #f87171;">✗ Passwords do not match</span>';
+        } else {
+            matchMsg.innerHTML = '';
+        }
+    }
+
+    confirmInput.addEventListener('input', checkMatch);
+
+    // Floating particles
+    (function() {
+        const wrapper = document.querySelector('.signup-wrapper');
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 5 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 8 + 's';
+            p.style.animationDuration = 8 + Math.random() * 8 + 's';
+            wrapper.appendChild(p);
+        }
+    })();
+</script>
 {% endblock %}
