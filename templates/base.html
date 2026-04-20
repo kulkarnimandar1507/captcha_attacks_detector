@@ -15,19 +15,20 @@
         <p class="subtitle">Behavior‑based bot detection (does not solve CAPTCHAs)</p>
         
         <nav>
-            <div class="nav-left">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('history') }}">History</a>
-            </div>
-            <div class="nav-right">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                    <a href="{{ url_for('signup') }}">Sign Up</a>
-                {% endif %}
-            </div>
-        </nav>
+    <div class="nav-left">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('history') }}">History</a>
+    </div>
+    <div class="nav-right">
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="Switch theme">🌙 Dark</button>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('signup') }}">Sign Up</a>
+        {% endif %}
+    </div>
+</nav>
     </header>
 
     <main>
@@ -45,5 +46,27 @@
     <footer>
         <p>Behavior‑based detection; does not solve CAPTCHAs.</p>
     </footer>
+ <script>
+    (function() {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (!toggleBtn) return;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            toggleBtn.textContent = '☀️ Light';
+        } else {
+            document.body.classList.remove('light-theme');
+            toggleBtn.textContent = '🌙 Dark';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            toggleBtn.textContent = isLight ? '☀️ Light' : '🌙 Dark';
+        });
+    })();
+</script>
 </body>
 </html>
